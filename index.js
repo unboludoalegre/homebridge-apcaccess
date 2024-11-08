@@ -74,6 +74,11 @@ class APCAccess {
       .getCharacteristic(Characteristic.StatusLowBattery)
       .on('get', this.getStatusLowBattery.bind(this));
 
+    this.lineService = new Service.LineService();
+    this.lineService
+      .getCharacteristic(Characteristic.LineVoltage)
+      .on('get', this.getLineVoltage.bind(this));
+
     if (!this.config.temperatureSensor) return;
     this.temperatureService = new Service.TemperatureSensor();
     this.temperatureService
