@@ -45,6 +45,7 @@ class APCAccess {
       batteryLevel: 0,
       lowBattery: 0,
       minutes: 0,
+      lineVoltage: 0,
       chargingState: undefined,
     });
 
