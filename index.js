@@ -88,7 +88,7 @@ class APCAccess {
 
   getServices() {
     // Required by Homebridge; expose services this accessory claims to have
-    const services = [this.informationService, this.contactSensor, this.batteryService];
+    const services = [this.informationService, this.contactSensor, this.batteryService, this.lineService];
 
     if (this.temperatureService) {
       services.push(this.temperatureService);
@@ -148,6 +148,10 @@ class APCAccess {
     callback(null, Characteristic.ContactSensorState[this.parseContactValue()]);
   }
 
+  getLineVoltage(callback) {
+    callback(null, this.parseLineVoltage());
+  }
+
   getTemperature(callback) {
     // ITEMP
     let tempPctValue = 0;
@@ -173,6 +177,8 @@ class APCAccess {
   parseContactValue = () => (this.latestJSON.STATFLAG & UPS_ACTIVE ? 'CONTACT_DETECTED' : 'CONTACT_NOT_DETECTED');
 
   parseLowBatteryValue = () => (this.latestJSON.STATFLAG & UPS_BATT_LOW ? 'BATTERY_LEVEL_LOW' : 'BATTERY_LEVEL_NORMAL');
+
+  parseLineVoltage = () => (this.loaded ? parseFloat(this.latestJSON.LINEV, 10) : 0);
 
   parseChargingState = () => (this.latestJSON.STATFLAG & UPS_NOT_CHARGEABLE
     ? 'NOT_CHARGEABLE'
@@ -239,6 +245,24 @@ class APCAccess {
       this.state.batteryLevel = batteryLevel;
     }
   }
+
+
+  checkLineVoltage() {
+    const lineVoltage = this.parseLineVoltage();
+
+    if (this.state.lineVoltage !== lineVoltage) {
+      this.log.update.info('Line Voltage:',
+        `${lineVoltage} V ${this.parseData(
+          'LINEV')
+          },
+      );
+      this.log.debug('Pushing battery level change; ', batteryLevel, this.state.batteryLevel);
+
+      this.batteryService.getCharacteristic(Characteristic.BatteryLevel).updateValue(batteryLevel);
+      this.state.batteryLevel = batteryLevel;
+    }
+  }
+
 
   doPolledChecks() {
     this.checkContact();
