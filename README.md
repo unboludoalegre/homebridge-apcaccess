@@ -1,4 +1,6 @@
 # homebridge-apcaccess
+trying to update and add options to:
+
 
 An [apcaccess](https://github.com/mapero/apcaccess) wrapper for [Homebridge](https://github.com/nfarina/homebridge). Supports precisely one UPS. If you're on battery power, the Contact Sensor is open.
 
